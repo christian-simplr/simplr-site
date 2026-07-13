@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Connecting… — Simplr Accounting Console</title>
+<style>
+  body{font-family:Georgia,'Times New Roman',serif;max-width:720px;margin:3rem auto;padding:0 1.5rem;color:#222;line-height:1.6}
+  h1{font-size:1.4rem;border-bottom:2px solid #2a5d84;padding-bottom:.5rem}
+  code{background:#f2f2f2;padding:.15rem .4rem;border-radius:3px;font-size:.9rem;word-break:break-all}
+  #manual{display:none}
+  footer{margin-top:3rem;font-size:.85rem;color:#777;border-top:1px solid #ddd;padding-top:1rem}
+</style>
+</head>
+<body>
+<h1>Finishing the QuickBooks connection…</h1>
+<p id="status">Handing off to the Simplr Accounting Console on this computer…</p>
+<div id="manual">
+  <p><strong>Automatic hand-off didn't complete.</strong> Make sure the console's
+  <em>connect</em> command is running on this computer, then
+  <a id="retry" href="#">try again</a>. If it still fails, copy the code below into the
+  console terminal:</p>
+  <p><code id="params"></code></p>
+</div>
+<footer>© Simplr Accounting. British Columbia, Canada.</footer>
+<script>
+  // Ponte do OAuth: a Intuit só redireciona (produção) para domínios https públicos.
+  // Esta página repassa o retorno (code/state/realmId) para o console local, que faz
+  // a troca do code pelo token. Nada é armazenado nem enviado a terceiros.
+  (function () {
+    var qs = window.location.search || '';
+    var target = 'http://localhost:5000/callback' + qs;
+    document.getElementById('retry').setAttribute('href', target);
+    document.getElementById('params').textContent = qs.replace(/^\?/, '');
+    if (qs.indexOf('code=') !== -1) {
+      window.location.replace(target);
+      // se o console não estiver rodando, mostra o fallback manual após alguns segundos
+      setTimeout(function () {
+        document.getElementById('status').style.display = 'none';
+        document.getElementById('manual').style.display = 'block';
+      }, 4000);
+    } else {
+      document.getElementById('status').textContent =
+        'This page is used only during the QuickBooks connection flow.';
+    }
+  })();
+</script>
+</body>
+</html>
